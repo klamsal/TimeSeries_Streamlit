@@ -1,13 +1,7 @@
-
-
-# To run app (put this in Terminal):
-#   streamlit run 00_jumpstart/03_streamlit_jumpstart.py
-
-
 # Import required libraries
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
 
 
 # 1.0 Title and Introduction
@@ -18,17 +12,10 @@ This dashboard provides insights into sales, customer demographics, and product 
 
 # 2.0 Data Input
 st.header("Upload Business Data")
-
-uploaded_file = st.file_uploader("Choose a CSV File", type = "csv", accept_multiple_files=False)
-
+uploaded_file = st.file_uploader("Choose a CSV File", type="csv", accept_multiple_files=False)
 
 # 3.0 App Body 
-#  What Happens Once Data Is Loaded?
-
-# data = pd.read_csv("00_jumpstart/data/sales.csv")
-
 if uploaded_file:
-    
     data = pd.read_csv(uploaded_file)
     st.write("Preview of the Uploaded Data:")
     st.write(data.head())
@@ -37,20 +24,21 @@ if uploaded_file:
     st.header("Sales Insights")
     if 'sales_date' in data.columns and 'sales_amount' in data.columns: 
         st.write("Sales Over Time")
-        fig = px.line(data, x = 'sales_date', y='sales_amount', title = 'Sales Over Time')
+        fig = go.Figure(data=go.Scatter(x=data['sales_date'], y=data['sales_amount'], mode='lines'))
+        fig.update_layout(title="Sales Over Time", xaxis_title="Date", yaxis_title="Sales Amount")
         st.plotly_chart(fig)
     else:
         st.warning("Please ensure your data has 'sales_date' and 'sales_amount' columns for sales visualization.")
-
 
     # * Customer Segmentation by Region
     st.header("Customer Segmentation")
     if 'region' in data.columns and 'sales_amount' in data.columns:
         st.write("Customer Segmentation")
-        fig = px.pie(data, names = "region", values = 'sales_amount')
+        fig = go.Figure(data=go.Pie(labels=data['region'], values=data['sales_amount']))
+        fig.update_layout(title="Customer Segmentation by Region")
         st.plotly_chart(fig)
     else:
-        st.warning("Please snsure your data has a 'region' column for customer segmentation.")
+        st.warning("Please ensure your data has a 'region' column for customer segmentation.")
 
     # * Product Analysis
     st.header("Product Analysis")
@@ -59,14 +47,13 @@ if uploaded_file:
         
         top_products_df = data.groupby('product').sum('sales_amount').nlargest(10, 'sales_amount')
         
-        fig = px.bar(top_products_df, x = top_products_df.index, y='sales_amount', title = "Top Products By Sales")
+        fig = go.Figure(data=go.Bar(x=top_products_df.index, y=top_products_df['sales_amount']))
+        fig.update_layout(title="Top Products By Sales", xaxis_title="Product", yaxis_title="Sales Amount")
         
         st.plotly_chart(fig)
         
     else:
         st.warning("Please ensure your data has 'product' and 'sales_amount' columns for product analysis.")
-    
-
 
     # * Feedback Form
     st.header("Feedback (Your Opinion Counts)")
@@ -74,11 +61,9 @@ if uploaded_file:
     if st.button("Submit Feedback"):
         st.success('Thank you for your feedback.')
 
-
 # 4.0 Footer
 st.write("---")
 st.write("This business dashboard template is flexible. Expand upon it based on your specific business needs.")
-
 
 if __name__ == "__main__":
     pass
