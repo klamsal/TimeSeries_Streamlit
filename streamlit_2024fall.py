@@ -1,8 +1,8 @@
 # Import required libraries
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
-
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # 1.0 Title and Introduction
 st.title("Business Dashboard")
@@ -24,9 +24,15 @@ if uploaded_file:
     st.header("Sales Insights")
     if 'sales_date' in data.columns and 'sales_amount' in data.columns: 
         st.write("Sales Over Time")
-        fig = go.Figure(data=go.Scatter(x=data['sales_date'], y=data['sales_amount'], mode='lines'))
-        fig.update_layout(title="Sales Over Time", xaxis_title="Date", yaxis_title="Sales Amount")
-        st.plotly_chart(fig)
+        
+        # Plotting with Seaborn
+        plt.figure(figsize=(10, 6))
+        sns.lineplot(data=data, x='sales_date', y='sales_amount')
+        plt.title("Sales Over Time")
+        plt.xlabel("Date")
+        plt.ylabel("Sales Amount")
+        st.pyplot(plt)  # Display the plot in Streamlit
+        
     else:
         st.warning("Please ensure your data has 'sales_date' and 'sales_amount' columns for sales visualization.")
 
@@ -34,9 +40,16 @@ if uploaded_file:
     st.header("Customer Segmentation")
     if 'region' in data.columns and 'sales_amount' in data.columns:
         st.write("Customer Segmentation")
-        fig = go.Figure(data=go.Pie(labels=data['region'], values=data['sales_amount']))
-        fig.update_layout(title="Customer Segmentation by Region")
-        st.plotly_chart(fig)
+        
+        # Plotting with Seaborn
+        plt.figure(figsize=(8, 8))
+        region_sales = data.groupby('region')['sales_amount'].sum().reset_index()
+        sns.barplot(data=region_sales, x='region', y='sales_amount')
+        plt.title("Customer Segmentation by Region")
+        plt.xlabel("Region")
+        plt.ylabel("Total Sales Amount")
+        st.pyplot(plt)
+        
     else:
         st.warning("Please ensure your data has a 'region' column for customer segmentation.")
 
@@ -45,12 +58,16 @@ if uploaded_file:
     if 'product' in data.columns and 'sales_amount' in data.columns:
         st.write("Top Products by Sales")
         
-        top_products_df = data.groupby('product').sum('sales_amount').nlargest(10, 'sales_amount')
+        # Calculating top products by sales
+        top_products_df = data.groupby('product')['sales_amount'].sum().nlargest(10).reset_index()
         
-        fig = go.Figure(data=go.Bar(x=top_products_df.index, y=top_products_df['sales_amount']))
-        fig.update_layout(title="Top Products By Sales", xaxis_title="Product", yaxis_title="Sales Amount")
-        
-        st.plotly_chart(fig)
+        # Plotting with Seaborn
+        plt.figure(figsize=(12, 6))
+        sns.barplot(data=top_products_df, x='product', y='sales_amount')
+        plt.title("Top Products By Sales")
+        plt.xlabel("Product")
+        plt.ylabel("Sales Amount")
+        st.pyplot(plt)
         
     else:
         st.warning("Please ensure your data has 'product' and 'sales_amount' columns for product analysis.")
