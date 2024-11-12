@@ -19,6 +19,10 @@ if uploaded_file:
     st.write("Preview of the Uploaded Data:")
     st.write(data.head())
 
+    # Ensure 'sales_date' column is in datetime format for proper plotting
+    if 'sales_date' in data.columns:
+        data['sales_date'] = pd.to_datetime(data['sales_date'])
+
     # * Sales insights
     st.header("Sales Insights")
     if 'sales_date' in data.columns and 'sales_amount' in data.columns: 
@@ -30,6 +34,13 @@ if uploaded_file:
         ax.set_title("Sales Over Time")
         ax.set_xlabel("Date")
         ax.set_ylabel("Sales Amount")
+        
+        # Rotate x-axis labels for better readability
+        plt.xticks(rotation=45, ha='right')
+        
+        # Adjust layout to avoid label cutoff
+        fig.tight_layout()
+        
         st.pyplot(fig)
         
     else:
@@ -60,11 +71,12 @@ if uploaded_file:
         
         # Plotting with Matplotlib
         fig, ax = plt.subplots(figsize=(12, 6))
-        ax.bar(top_products_df.index, top_products_df.values)
+        ax.bar(top_products_df.index, top_products_df.values, color='skyblue')
         ax.set_title("Top Products By Sales")
         ax.set_xlabel("Product")
         ax.set_ylabel("Sales Amount")
-        plt.xticks(rotation=45)
+        plt.xticks(rotation=45, ha='right')
+        fig.tight_layout()
         st.pyplot(fig)
         
     else:
