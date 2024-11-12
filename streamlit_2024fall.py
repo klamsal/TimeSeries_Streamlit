@@ -1,7 +1,6 @@
 # Import required libraries
 import streamlit as st
 import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 # 1.0 Title and Introduction
@@ -25,13 +24,13 @@ if uploaded_file:
     if 'sales_date' in data.columns and 'sales_amount' in data.columns: 
         st.write("Sales Over Time")
         
-        # Plotting with Seaborn
-        plt.figure(figsize=(10, 6))
-        sns.lineplot(data=data, x='sales_date', y='sales_amount')
-        plt.title("Sales Over Time")
-        plt.xlabel("Date")
-        plt.ylabel("Sales Amount")
-        st.pyplot(plt)  # Display the plot in Streamlit
+        # Plotting with Matplotlib
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(data['sales_date'], data['sales_amount'], marker='o', linestyle='-')
+        ax.set_title("Sales Over Time")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Sales Amount")
+        st.pyplot(fig)
         
     else:
         st.warning("Please ensure your data has 'sales_date' and 'sales_amount' columns for sales visualization.")
@@ -41,14 +40,12 @@ if uploaded_file:
     if 'region' in data.columns and 'sales_amount' in data.columns:
         st.write("Customer Segmentation")
         
-        # Plotting with Seaborn
-        plt.figure(figsize=(8, 8))
-        region_sales = data.groupby('region')['sales_amount'].sum().reset_index()
-        sns.barplot(data=region_sales, x='region', y='sales_amount')
-        plt.title("Customer Segmentation by Region")
-        plt.xlabel("Region")
-        plt.ylabel("Total Sales Amount")
-        st.pyplot(plt)
+        # Plotting with Matplotlib
+        fig, ax = plt.subplots(figsize=(8, 8))
+        region_sales = data.groupby('region')['sales_amount'].sum()
+        ax.pie(region_sales, labels=region_sales.index, autopct='%1.1f%%', startangle=90)
+        ax.set_title("Customer Segmentation by Region")
+        st.pyplot(fig)
         
     else:
         st.warning("Please ensure your data has a 'region' column for customer segmentation.")
@@ -59,15 +56,16 @@ if uploaded_file:
         st.write("Top Products by Sales")
         
         # Calculating top products by sales
-        top_products_df = data.groupby('product')['sales_amount'].sum().nlargest(10).reset_index()
+        top_products_df = data.groupby('product')['sales_amount'].sum().nlargest(10)
         
-        # Plotting with Seaborn
-        plt.figure(figsize=(12, 6))
-        sns.barplot(data=top_products_df, x='product', y='sales_amount')
-        plt.title("Top Products By Sales")
-        plt.xlabel("Product")
-        plt.ylabel("Sales Amount")
-        st.pyplot(plt)
+        # Plotting with Matplotlib
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.bar(top_products_df.index, top_products_df.values)
+        ax.set_title("Top Products By Sales")
+        ax.set_xlabel("Product")
+        ax.set_ylabel("Sales Amount")
+        plt.xticks(rotation=45)
+        st.pyplot(fig)
         
     else:
         st.warning("Please ensure your data has 'product' and 'sales_amount' columns for product analysis.")
